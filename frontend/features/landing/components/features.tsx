@@ -6,7 +6,7 @@ const Features = () => {
         <section id="features" className="container mx-auto px-4 py-20">
             <div className="text-center mb-16">
                 <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-                    Why Choose <span className="bg-gradient-to-r from-gray-400 to-white bg-clip-text text-transparent">Collaborix</span>?
+                    Why Choose <span className="bg-gradient-to-r from-gray-400 to-white bg-clip-text text-transparent">CollabCode</span>?
                 </h2>
                 <p className="text-gray-400 text-lg max-w-2xl mx-auto">
                     Experience the future of collaborative coding with our comprehensive platform designed for modern developers.

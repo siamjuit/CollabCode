@@ -2,7 +2,6 @@
 
 import React from 'react';
 import {Button} from "@/components/ui/button";
-import {MousePointerClickIcon} from "lucide-react";
 import {useRouter} from "next/navigation";
 
 const Hero = () => {
@@ -61,6 +60,7 @@ const Hero = () => {
                                     <span className="text-white">function</span> <span className="text-yellow-400">twoSum</span>
                                     <span className="text-gray-300">(nums, target) {`{`}</span>
                                 </div>
+                                {/* eslint-disable-next-line react/jsx-no-comment-textnodes */}
                                 <div className="text-gray-500 ml-4">// Collaborative coding in action</div>
                                 <div className="text-gray-300 ml-4">
                                     <span className="text-white">const</span> <span className="text-blue-400">map</span> =

@@ -1,22 +1,18 @@
 "use client"
 
 import React from 'react'
-import { Button } from "@/components/ui/button"
-import { Code, Users, Clock, Target, Sun, Menu, X } from "lucide-react"
-import Link from "next/link"
-import { useState } from "react"
 import Header from "@/features/landing/components/header";
 import Hero from "@/features/landing/components/hero";
 import Stats from "@/features/landing/components/stats";
 import Features from "@/features/landing/components/features";
 import Cta from "@/features/landing/components/CTA";
 
-export default function CollaborixLanding() {
+const page = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
-            {/* Header */}
-            <Header />
+            {/*/!* Header *!/*/}
+            {/*<Header />*/}
 
             {/* Hero Section */}
             <Hero />
@@ -32,3 +28,5 @@ export default function CollaborixLanding() {
         </div>
     )
 }
+
+export default page;

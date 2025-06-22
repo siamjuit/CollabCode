@@ -1,17 +1,24 @@
+"use client"
+
 import React, {useState} from 'react';
-import {Code, Menu, Sun, X} from "lucide-react";
-import Link from "next/link";
+import {Code, Menu, X} from "lucide-react";
 import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
 
 const Header = () => {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-
+    const router = useRouter()
 
     return (
         <header className="border-b border-gray-800/50 backdrop-blur-sm sticky top-0 z-50">
-            <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
+            <div className="container mx-auto px-4 h-16 flex items-center justify-between cursor-pointer">
+                <div
+                    className="flex items-center space-x-2"
+                    onClick={() => {
+                        router.push("/");
+                    }}
+                >
                     <div className="p-2 bg-gray-600/20 rounded-lg">
                         <Code className="h-6 w-6 text-gray-400" />
                     </div>
