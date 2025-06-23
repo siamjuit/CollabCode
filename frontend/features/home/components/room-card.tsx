@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { v4 as uuidV4 } from 'uuid';
 import { Copy, Users, Plus } from 'lucide-react';
 import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 type RoomMode = 'join' | 'create';
 
@@ -18,6 +19,7 @@ const RoomCard = () => {
     const [generatedRoomId, setGeneratedRoomId] = useState('');
     const [roomName, setRoomName] = useState('');
     const [username, setUsername] = useState('');
+    const router = useRouter();
 
 
     const handleCreateRoom = () => {
@@ -27,7 +29,11 @@ const RoomCard = () => {
         }
 
         const newRoomId = uuidV4();
+
         setGeneratedRoomId(newRoomId);
+
+        router.push(`/editor/${generatedRoomId}?username=${encodeURIComponent(username)}&roomName=${encodeURIComponent(roomName)}`);
+
 
         toast.success("Room created successfully.");
     };
@@ -37,6 +43,9 @@ const RoomCard = () => {
             toast("All field are required");
             return;
         }
+
+        router.push(`/editor/${roomId}?username=${encodeURIComponent(username)}&roomName=${encodeURIComponent(roomName)}`);
+
 
         toast("Room joined successfully.");
     };
