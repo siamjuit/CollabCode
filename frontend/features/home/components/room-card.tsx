@@ -32,7 +32,7 @@ const RoomCard = () => {
 
         setGeneratedRoomId(newRoomId);
 
-        router.push(`/editor/${generatedRoomId}?username=${encodeURIComponent(username)}&roomName=${encodeURIComponent(roomName)}`);
+        router.push(`/editor/${newRoomId}?username=${encodeURIComponent(username)}&roomName=${encodeURIComponent(roomName)}`);
 
 
         toast.success("Room created successfully.");
