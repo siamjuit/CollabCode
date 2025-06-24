@@ -1,13 +1,17 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import EditorSidebar from '@/features/editor/components/editor-sidebar';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import {useParams, useRouter, useSearchParams} from "next/navigation";
+import {redirect, useParams, useRouter, useSearchParams} from "next/navigation";
 import {PanelLeftIcon} from "lucide-react";
+import {initSocket} from "@/config/socket";
+import {Socket} from "socket.io-client";
+import {ACTION} from "@/lib/utils";
+import {toast} from "sonner";
 
 const EditorPage = () => {
     const params =  useParams();
@@ -43,6 +47,35 @@ hello();`);
             await navigator.clipboard.writeText(roomId as string);
         }
     };
+
+    const socketRef = useRef<Socket | null>(null);
+
+    useEffect(() => {
+
+        const init = async () => {
+            socketRef.current = await initSocket();
+            socketRef.current.on('connect_error', (err) => handleError(err))
+            socketRef.current.on('connect_failed', (err) => handleError(err))
+
+            const handleError = (e: Error) => {
+                console.log(e);
+                toast.error("Error joining room")
+                router.push("/home")
+            }
+
+            // socketRef.current.emit(ACTION.JOIN, {
+            //     roomId: roomId as string,
+            //     username,
+            // });
+        }
+
+        init();
+    }, []);
+
+    if( !username ){
+        toast.error("Username is required")
+        redirect('/home')
+    }
 
     return (
         <div>
