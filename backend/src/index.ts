@@ -26,12 +26,21 @@ io.on('connection', (socket) => {
         userSocketMap[socket.id] = username;
         socket.join(roomId);
         const clients = getAllConnectedClients(roomId);
-        console.log(clients);
-    })
+
+        console.log(JSON.stringify(clients));
+
+        clients.forEach(({ socketId }) => {
+            io.to(socketId).emit(ACTION.JOINED, {
+                clients,
+                username,
+                socketId: socket.id
+            })
+        });
+    });
 
 });
 
-const PORT = 3000;
+const PORT = 5000;
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

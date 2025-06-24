@@ -19,24 +19,20 @@ const EditorPage = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
 
-    const username = searchParams.get('username') || 'Anonymous';
+    const currUsername = searchParams.get('username') || 'Anonymous';
     const roomName = searchParams.get('roomName') || `Room ${roomId}`;
 
     const [code, setCode] = useState(`// Welcome to the collaborative code editor!
 
 function hello() {
-  console.log("Hello, ${username}!");
+  console.log("Hello, ${currUsername}!");
   console.log("You're now in room: ${roomId}");
 }
 
 hello();`);
 
     // Mock users for demonstration
-    const [users] = useState([
-        { id: 1, username, avatar: username.charAt(0).toUpperCase(), isOnline: true },
-        { id: 2, username: 'Alice', avatar: 'A', isOnline: true },
-        { id: 3, username: 'Bob', avatar: 'B', isOnline: false },
-    ]);
+    const [users, setUsers] = useState<any[]>([])
 
     const handleLeaveRoom = () => {
         router.push("/home")
@@ -63,16 +59,26 @@ hello();`);
                 router.push("/home")
             }
 
-            // socketRef.current.emit(ACTION.JOIN, {
-            //     roomId: roomId as string,
-            //     username,
-            // });
+            socketRef.current.emit(ACTION.JOIN, {
+                roomId: roomId as string,
+                username: currUsername,
+            });
+
+            socketRef.current.on(ACTION.JOINED, ({ clients, username, socketId }) => {
+                if( username  !== currUsername ){
+                    toast.success(`${username} joined the room`)
+                }
+
+                console.log(clients)
+
+                setUsers(clients)
+            })
         }
 
         init();
     }, []);
 
-    if( !username ){
+    if( !currUsername ){
         toast.error("Username is required")
         redirect('/home')
     }
