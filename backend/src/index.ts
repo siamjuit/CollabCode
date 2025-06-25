@@ -1,67 +1,82 @@
 import express from 'express';
-import http from "http";
-import { Server } from "socket.io";
-import {ACTION} from "./utils/actions";
+import http from 'http';
+import { Server } from 'socket.io';
+import { ACTION } from './utils/actions';
 
 const app = express();
 const server = http.createServer(app);
-
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+    },
+});
 
 const userSocketMap: Record<string, string> = {};
 
+const latestCodeMap: Record<string, string> = {};
+
 const getAllConnectedClients = (roomId: string) => {
-    return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map((socketId) => {
-        return {
-            socketId,
-            username: userSocketMap[socketId]
-        }
+    return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map((socketId) => ({
+        socketId,
+        username: userSocketMap[socketId],
+    }));
+};
+
+const handleDisconnect = (socket: any) => {
+    const rooms = [...socket.rooms];
+
+    rooms.forEach((roomId) => {
+        socket.to(roomId).emit(ACTION.DISCONNECTED, {
+            socketId: socket.id,
+            username: userSocketMap[socket.id],
+        });
     });
-}
+
+    delete userSocketMap[socket.id];
+};
 
 io.on('connection', (socket) => {
-    console.log('a user connected', socket.id);
+    console.log('User connected:', socket.id);
 
     socket.on(ACTION.JOIN, ({ roomId, username }) => {
         userSocketMap[socket.id] = username;
         socket.join(roomId);
-        const clients = getAllConnectedClients(roomId);
 
-        console.log(JSON.stringify(clients));
+        const clients = getAllConnectedClients(roomId);
+        console.log( clients);
 
         clients.forEach(({ socketId }) => {
             io.to(socketId).emit(ACTION.JOINED, {
                 clients,
                 username,
-                socketId: socket.id
-            })
+                socketId: socket.id,
+            });
         });
     });
 
-    socket.on(ACTION.CODE_CHANGE, ({roomId, code}) => {
-        io.to(roomId).emit(ACTION.CODE_CHANGE, {code});
-    })
+    socket.on(ACTION.REQUEST_SYNC, ({ roomId, socketId }) => {
+        const latestCode = latestCodeMap[roomId] || '';
+        io.to(socketId).emit(ACTION.SYNC_CODE, { code: latestCode });
+    });
+
+    socket.on(ACTION.CODE_CHANGE, ({ roomId, code }) => {
+        latestCodeMap[roomId] = code;
+        socket.to(roomId).emit(ACTION.CODE_CHANGE, { code });
+    });
 
     socket.on('disconnecting', () => {
-        const rooms = [ ...socket.rooms ];
-
-        rooms.forEach((roomId) => {
-            socket.in(roomId).emit(ACTION.DISCONNECTED, {
-                socketId: socket.id,
-                username: userSocketMap[socket.id]
-            });
-
-            socket.leave(roomId);
-
-        });
-
-        delete userSocketMap[socket.id];
+        handleDisconnect(socket);
     });
 
+    socket.on('leave', () => {
+        handleDisconnect(socket);
+        socket.disconnect();
+    });
 });
 
 const PORT = 5000;
 
 server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-})
+    console.log(`🚀Server is running on port ${PORT}`);
+});

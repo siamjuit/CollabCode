@@ -12,7 +12,7 @@ import { initSocket } from "@/config/socket";
 import { Socket } from "socket.io-client";
 import { ACTION } from "@/lib/utils";
 import { toast } from "sonner";
-import {User} from "@/lib/types";
+import { User } from "@/lib/types";
 
 const EditorPage = () => {
     const params = useParams();
@@ -26,19 +26,19 @@ const EditorPage = () => {
     const [code, setCode] = useState(`// Welcome to the collaborative code editor!
 
 function hello() {
-  console.log("Hello, ${currUsername}!");
+  console.log("Hello!");
   console.log("You're now in room: ${roomId}");
 }
 
 hello();`);
 
     const [users, setUsers] = useState<User[]>([]);
-
     const socketRef = useRef<Socket | null>(null);
     const hasInitialized = useRef(false);
     const isRemoteUpdate = useRef(false);
 
     const handleLeaveRoom = () => {
+        socketRef.current?.emit('leave');
         router.push("/home");
     };
 
@@ -76,6 +76,10 @@ hello();`);
                     toast.success(`${username} joined the room`);
                 }
                 setUsers(clients);
+                socket.emit(ACTION.REQUEST_SYNC, {
+                    roomId,
+                    socketId: socket.id,
+                });
             });
 
             socket.on(ACTION.DISCONNECTED, ({ socketId, username }) => {
@@ -85,8 +89,15 @@ hello();`);
                 );
             });
 
+            socket.on(ACTION.SYNC_CODE, ({ code: incomingCode }) => {
+                if (incomingCode !== null) {
+                    isRemoteUpdate.current = true;
+                    setCode(incomingCode);
+                }
+            });
+
             socket.on(ACTION.CODE_CHANGE, ({ code: incomingCode }) => {
-                if( code !== null ) {
+                if (incomingCode !== null) {
                     isRemoteUpdate.current = true;
                     setCode(incomingCode);
                 }
@@ -103,6 +114,7 @@ hello();`);
                 socket.off("connect_failed");
                 socket.off(ACTION.JOINED);
                 socket.off(ACTION.DISCONNECTED);
+                socket.off(ACTION.SYNC_CODE);
                 socket.off(ACTION.CODE_CHANGE);
                 socketRef.current = null;
             }
