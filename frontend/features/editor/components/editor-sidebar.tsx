@@ -15,13 +15,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Copy, LogOut } from 'lucide-react';
 import {toast} from "sonner";
-
-interface User {
-    id: number;
-    username: string;
-    avatar: string;
-    isOnline: boolean;
-}
+import {User} from "@/lib/types";
 
 interface EditorSidebarProps {
     roomName: string;
@@ -50,7 +44,7 @@ const EditorSidebar = ({ roomName, users, onLeaveRoom, onCopyRoomId }: EditorSid
 
     return (
         <Sidebar className="bg-black/80 border-r border-gray-700/30 backdrop-blur-md mt-16 pb-16">
-            <SidebarHeader className="border-b border-gray-700/30 p-4 bg-transparent bg-sidebar-accent-foreground">
+            <SidebarHeader className="border-b border-gray-700/30 p-4 bg-sidebar-accent-foreground">
                 <div className="space-y-2">
                     <h2 className="text-lg font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent truncate">{roomName}</h2>
                 </div>
@@ -59,33 +53,23 @@ const EditorSidebar = ({ roomName, users, onLeaveRoom, onCopyRoomId }: EditorSid
             <SidebarContent className="bg-sidebar-accent-foreground">
                 <SidebarGroup>
                     <SidebarGroupLabel className="text-gray-500 text-sm font-medium">
-                        Connected Users ({users.filter(u => u.isOnline).length})
+                        Connected Users ({users.length})
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {users.map((user) => (
-                                <SidebarMenuItem key={user.id}>
+                                <SidebarMenuItem key={user.socketId}>
                                     <SidebarMenuButton className="flex items-center gap-3 px-3 py-2 hover:bg-gray-800/30 transition-colors">
                                         <div className="relative">
                                             <Avatar className="h-8 w-8">
-                                                <AvatarFallback className={`text-xs font-medium ${
-                                                    user.isOnline
-                                                        ? 'bg-gradient-to-br from-emerald-600 to-emerald-700 text-white'
-                                                        : 'bg-gradient-to-br from-gray-700 to-gray-800 text-gray-400'
-                                                }`}>
-                                                    {user.avatar}
+                                                <AvatarFallback className={`text-white bg-blue-600 font-semibold text-lg uppercase rounded-md`}>
+                                                    {user.username[0]}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-black ${
-                                                user.isOnline ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-gray-600'
-                                            }`} />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium text-gray-200 truncate">
                                                 {user.username}
-                                            </p>
-                                            <p className="text-xs text-gray-500">
-                                                {user.isOnline ? 'Online' : 'Offline'}
                                             </p>
                                         </div>
                                     </SidebarMenuButton>

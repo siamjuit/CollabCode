@@ -38,6 +38,26 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on(ACTION.CODE_CHANGE, ({roomId, code}) => {
+        io.to(roomId).emit(ACTION.CODE_CHANGE, {code});
+    })
+
+    socket.on('disconnecting', () => {
+        const rooms = [ ...socket.rooms ];
+
+        rooms.forEach((roomId) => {
+            socket.in(roomId).emit(ACTION.DISCONNECTED, {
+                socketId: socket.id,
+                username: userSocketMap[socket.id]
+            });
+
+            socket.leave(roomId);
+
+        });
+
+        delete userSocketMap[socket.id];
+    });
+
 });
 
 const PORT = 5000;

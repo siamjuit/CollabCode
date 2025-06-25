@@ -1,26 +1,27 @@
-"use client"
+"use client";
 
-import React, {useEffect, useRef, useState} from 'react';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import EditorSidebar from '@/features/editor/components/editor-sidebar';
-import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
-import {redirect, useParams, useRouter, useSearchParams} from "next/navigation";
-import {PanelLeftIcon} from "lucide-react";
-import {initSocket} from "@/config/socket";
-import {Socket} from "socket.io-client";
-import {ACTION} from "@/lib/utils";
-import {toast} from "sonner";
+import React, { useEffect, useRef, useState } from "react";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import EditorSidebar from "@/features/editor/components/editor-sidebar";
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { redirect, useParams, useRouter, useSearchParams } from "next/navigation";
+import { PanelLeftIcon } from "lucide-react";
+import { initSocket } from "@/config/socket";
+import { Socket } from "socket.io-client";
+import { ACTION } from "@/lib/utils";
+import { toast } from "sonner";
+import {User} from "@/lib/types";
 
 const EditorPage = () => {
-    const params =  useParams();
-    const roomId = params.roomId;
+    const params = useParams();
+    const roomId = params.roomId as string;
     const searchParams = useSearchParams();
     const router = useRouter();
 
-    const currUsername = searchParams.get('username') || 'Anonymous';
-    const roomName = searchParams.get('roomName') || `Room ${roomId}`;
+    const currUsername = searchParams.get("username") || "Anonymous";
+    const roomName = searchParams.get("roomName") || `Room ${roomId}`;
 
     const [code, setCode] = useState(`// Welcome to the collaborative code editor!
 
@@ -31,56 +32,100 @@ function hello() {
 
 hello();`);
 
-    // Mock users for demonstration
-    const [users, setUsers] = useState<any[]>([])
+    const [users, setUsers] = useState<User[]>([]);
+
+    const socketRef = useRef<Socket | null>(null);
+    const hasInitialized = useRef(false);
+    const isRemoteUpdate = useRef(false);
 
     const handleLeaveRoom = () => {
-        router.push("/home")
+        router.push("/home");
     };
 
     const handleCopyRoomId = async () => {
         if (roomId) {
-            await navigator.clipboard.writeText(roomId as string);
+            await navigator.clipboard.writeText(roomId);
+            toast.success("Room ID copied!");
         }
     };
 
-    const socketRef = useRef<Socket | null>(null);
-
     useEffect(() => {
+        if (hasInitialized.current) return;
+        hasInitialized.current = true;
 
         const init = async () => {
-            socketRef.current = await initSocket();
-            socketRef.current.on('connect_error', (err) => handleError(err))
-            socketRef.current.on('connect_failed', (err) => handleError(err))
+            const socket = await initSocket();
+            socketRef.current = socket;
 
             const handleError = (e: Error) => {
-                console.log(e);
-                toast.error("Error joining room")
-                router.push("/home")
-            }
+                console.error(e);
+                toast.error("Error joining room");
+                router.push("/home");
+            };
 
-            socketRef.current.emit(ACTION.JOIN, {
-                roomId: roomId as string,
+            socket.on("connect_error", handleError);
+            socket.on("connect_failed", handleError);
+
+            socket.emit(ACTION.JOIN, {
+                roomId,
                 username: currUsername,
             });
 
-            socketRef.current.on(ACTION.JOINED, ({ clients, username, socketId }) => {
-                if( username  !== currUsername ){
-                    toast.success(`${username} joined the room`)
+            socket.on(ACTION.JOINED, ({ clients, username }) => {
+                if (username !== currUsername) {
+                    toast.success(`${username} joined the room`);
                 }
+                setUsers(clients);
+            });
 
-                console.log(clients)
+            socket.on(ACTION.DISCONNECTED, ({ socketId, username }) => {
+                toast.success(`${username} disconnected`);
+                setUsers((prevUsers) =>
+                    prevUsers.filter((u) => u.socketId !== socketId)
+                );
+            });
 
-                setUsers(clients)
-            })
-        }
+            socket.on(ACTION.CODE_CHANGE, ({ code: incomingCode }) => {
+                if( code !== null ) {
+                    isRemoteUpdate.current = true;
+                    setCode(incomingCode);
+                }
+            });
+        };
 
         init();
+
+        return () => {
+            const socket = socketRef.current;
+            if (socket) {
+                socket.disconnect();
+                socket.off("connect_error");
+                socket.off("connect_failed");
+                socket.off(ACTION.JOINED);
+                socket.off(ACTION.DISCONNECTED);
+                socket.off(ACTION.CODE_CHANGE);
+                socketRef.current = null;
+            }
+        };
     }, []);
 
-    if( !currUsername ){
-        toast.error("Username is required")
-        redirect('/home')
+    const handleCodeChange = (value: string) => {
+        if (isRemoteUpdate.current) {
+            isRemoteUpdate.current = false;
+            return;
+        }
+
+        setCode(value);
+
+        socketRef.current?.emit(ACTION.CODE_CHANGE, {
+            roomId,
+            code: value,
+        });
+    };
+
+    if (!currUsername) {
+        toast.error("Username is required");
+        redirect("/home");
     }
 
     return (
@@ -89,19 +134,18 @@ hello();`);
                 <div className="flex w-full">
                     <EditorSidebar
                         roomName={roomName}
-                        roomId={roomId as string || ''}
+                        roomId={roomId}
                         users={users}
                         onLeaveRoom={handleLeaveRoom}
                         onCopyRoomId={handleCopyRoomId}
                     />
                     <main className="flex-1 flex flex-col">
                         <header className="bg-black/40 border-b border-gray-700/50 p-4 flex items-center gap-4">
-                            <SidebarTrigger className="text-white">
+                            <SidebarTrigger className="text-white cursor-pointer">
                                 <PanelLeftIcon color="white" size={24} />
                             </SidebarTrigger>
                             <div className="flex-1">
                                 <h1 className="text-xl font-bold text-white">{roomName}</h1>
-                                <p className="text-sm text-gray-400">Room ID: {roomId as string}</p>
                             </div>
                         </header>
 
@@ -112,17 +156,17 @@ hello();`);
                                     height="100%"
                                     theme={oneDark}
                                     extensions={[javascript({ jsx: true })]}
-                                    onChange={(value) => setCode(value)}
+                                    onChange={(value) => handleCodeChange(value)}
                                     basicSetup={{
                                         lineNumbers: true,
                                         foldGutter: true,
-                                        dropCursor: false,
-                                        allowMultipleSelections: false,
+                                        dropCursor: true,
+                                        allowMultipleSelections: true,
                                         indentOnInput: true,
                                         bracketMatching: true,
                                         closeBrackets: true,
                                         autocompletion: true,
-                                        highlightSelectionMatches: false,
+                                        highlightSelectionMatches: true,
                                     }}
                                     className="text-sm"
                                 />
