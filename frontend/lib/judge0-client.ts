@@ -16,7 +16,7 @@ export const executeCodeClient = async (
         throw new Error(error.message || 'Failed to execute code');
     }
 
-    return response.json();
+    return await response.json();
 }
 
 export const submitCodeClient = async (
@@ -35,7 +35,7 @@ export const submitCodeClient = async (
         throw new Error(error.message || 'Failed to submit code');
     }
 
-    return response.json();
+    return await response.json();
 }
 
 export const getResultClient = async(token: string): Promise<SubmissionResult> => {
@@ -46,5 +46,5 @@ export const getResultClient = async(token: string): Promise<SubmissionResult> =
         throw new Error(error.message || 'Failed to get result');
     }
 
-    return response.json();
+    return await response.json();
 }

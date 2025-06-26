@@ -23,25 +23,28 @@ export const submitCode = async (submission: SubmissionRequest, config: Judge0Co
         throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    console.log(response.json());
+    const data = await response.json();
 
-    return response.json();
+    console.log(data);
+    return data;
 }
 
 export const getSubmission = async (token: string, config: Judge0Config) => {
 
-    const response = await fetch(`${url}/submissions/${token}?base64_encoded=true&fields=*'`, {
+    const response = await fetch(`${url}/submissions/${token}?base64_encoded=true&fields=*`, {
         method: 'GET',
         headers: getHeaders(config.apiKey)
     });
 
     if (!response.ok) {
+        console.log(response);
         throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    console.log(response.json());
+    const data = await response.json();
 
-    return response.json();
+    console.log(data);
+    return data;
 }
 
 export const executeCode = async (

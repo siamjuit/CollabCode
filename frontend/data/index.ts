@@ -5,7 +5,7 @@ export const LANGUAGES = {
     CSHARP: 51,
     GO: 60,
     JAVA: 62,
-    JAVASCRIPT: 63,
+    JAVASCRIPT: 27,
     PYTHON: 71,
     RUST: 73,
     TYPESCRIPT: 74,

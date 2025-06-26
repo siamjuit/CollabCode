@@ -1,6 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSubmission } from '@/lib/judge0';
 
+// Helper function to safely decode base64
+const decodeBase64 = (str: string | null): string | null => {
+    if (!str) return null;
+    try {
+        return atob(str);
+    } catch (e) {
+        console.warn('Failed to decode base64:', str);
+        return str; // Return original if decoding fails
+    }
+};
+
+// Process and decode Judge0 response
+const processExecutionResult = (result: any) => {
+    return {
+        ...result,
+        // Decode base64 encoded fields
+        stdout: decodeBase64(result.stdout),
+        stderr: decodeBase64(result.stderr),
+        compile_output: decodeBase64(result.compile_output),
+        // Add convenience fields
+        success: result.status_id === 3, // Status ID 3 = Accepted
+        hasOutput: !!result.stdout,
+        hasError: !!result.stderr || result.exit_code !== 0,
+        // Keep original encoded values for reference if needed
+        raw: {
+            stdout: result.stdout,
+            stderr: result.stderr,
+            compile_output: result.compile_output
+        }
+    };
+};
+
 export async function GET(
     request: NextRequest,
     { params }: { params: { token: string } }
@@ -21,7 +53,12 @@ export async function GET(
 
         const result = await getSubmission(token, config);
 
-        return NextResponse.json(result);
+        // Process and decode the result
+        const processedResult = processExecutionResult(result);
+
+        console.log("result: ", processedResult);
+
+        return NextResponse.json(processedResult);
     } catch (error) {
         console.error('Error getting result:', error);
         return NextResponse.json(

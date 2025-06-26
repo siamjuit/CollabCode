@@ -14,12 +14,15 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        const cleanSourceCode = source_code.trim();
+        const base64SourceCode = btoa(unescape(encodeURIComponent(cleanSourceCode)));
+
         const config = {
             apiKey: process.env.JUDGE0_API_KEY!,
         };
 
         const result = await executeCode({
-            source_code,
+            source_code: base64SourceCode,
             language_id,
             stdin: stdin || '',
         }, config);

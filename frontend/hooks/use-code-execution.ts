@@ -15,7 +15,7 @@ export const useCodeExecution = () => {
         try {
             const data = await executeCodeClient(submission);
             setResult(data);
-        } catch (err) {
+        } catch (err) {useCodeExecution
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
@@ -42,6 +42,7 @@ export const useCodeExecution = () => {
                 attempts++;
             } while (data.status.id <= 2 && attempts < maxAttempts);
 
+            console.log(data);
             setResult(data);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');

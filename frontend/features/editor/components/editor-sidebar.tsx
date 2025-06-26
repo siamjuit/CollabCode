@@ -18,14 +18,13 @@ import {toast} from "sonner";
 import {User} from "@/lib/types";
 
 interface EditorSidebarProps {
-    roomName: string;
     roomId: string;
     users: User[];
     onLeaveRoom: () => void;
     onCopyRoomId: () => void;
 }
 
-const EditorSidebar = ({ roomName, users, onLeaveRoom, onCopyRoomId }: EditorSidebarProps) => {
+const EditorSidebar = ({ users, onLeaveRoom, onCopyRoomId }: EditorSidebarProps) => {
 
     const handleCopyRoomId = async () => {
         try {
@@ -46,7 +45,7 @@ const EditorSidebar = ({ roomName, users, onLeaveRoom, onCopyRoomId }: EditorSid
         <Sidebar className="bg-black/80 border-r border-gray-700/30 backdrop-blur-md mt-16 pb-16">
             <SidebarHeader className="border-b border-gray-700/30 p-4 bg-sidebar-accent-foreground">
                 <div className="space-y-2">
-                    <h2 className="text-lg font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent truncate">{roomName}</h2>
+                    <h2 className="text-lg font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent truncate">Collab Code</h2>
                 </div>
             </SidebarHeader>
 
