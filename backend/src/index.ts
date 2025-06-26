@@ -65,11 +65,11 @@ io.on('connection', (socket) => {
         socket.to(roomId).emit(ACTION.CODE_CHANGE, { code });
     });
 
-    socket.on(ACTION.CURSOR_MOVE, ({ roomId, cursor, username }) => {
-        socket.to(roomId).emit(ACTION.CURSOR_MOVE, {
+    socket.on(ACTION.CURSOR_MOVE, ({ roomId, position, username }) => {
+        socket.in(roomId).emit(ACTION.CURSOR_MOVE, {
             socketId: socket.id,
-            cursor,
-            username,
+            position,
+            username
         });
     });
 

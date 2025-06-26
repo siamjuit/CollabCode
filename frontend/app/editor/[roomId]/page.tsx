@@ -7,7 +7,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { redirect, useParams, useRouter, useSearchParams } from "next/navigation";
-import { PanelLeftIcon } from "lucide-react";
+import {PanelLeftIcon, Play} from "lucide-react";
 import { initSocket } from "@/config/socket";
 import { Socket } from "socket.io-client";
 import { ACTION } from "@/lib/utils";
@@ -156,8 +156,11 @@ hello();`);
                             <SidebarTrigger className="text-white cursor-pointer">
                                 <PanelLeftIcon color="white" size={24} />
                             </SidebarTrigger>
-                            <div className="flex-1">
+                            <div className="flex flex-1 justify-between items-center">
                                 <h1 className="text-xl font-bold text-white">{roomName}</h1>
+                                <div className={" bg-gray-600 py-2 px-4 rounded-lg cursor-pointer hover:bg-gray-700"} >
+                                    <Play className={"cursor-pointer text-white "} />
+                                </div>
                             </div>
                         </header>
 
