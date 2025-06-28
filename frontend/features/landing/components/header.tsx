@@ -32,17 +32,18 @@ const Header = () => {
                     <Button
                         variant="ghost"
                         className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
+                        onClick={() => router.push("/sign-in")}
                     >
                         Sign in
                     </Button>
                     <Button
                         className="bg-gray-700 hover:bg-gray-600 text-white shadow-lg shadow-gray-700/25 cursor-pointer"
+                        onClick={() => router.push("/sign-up")}
                     >
                         Sign up
                     </Button>
                 </div>
 
-                {/* Mobile menu button */}
                 <Button
                     variant="ghost"
                     size="icon"

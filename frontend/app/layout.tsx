@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/features/landing/components/header";
 import {Toaster} from "sonner";
 import React from "react";
+import {ReduxProvider} from "@/app/redux-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,9 @@ export default function RootLayout({
       >
         <Toaster />
         <Header />
-        {children}
+        <ReduxProvider>
+          {children}
+        </ReduxProvider>
       </body>
     </html>
   );

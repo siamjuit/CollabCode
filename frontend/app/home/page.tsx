@@ -1,7 +1,18 @@
 
 import RoomCard from "@/features/home/components/room-card";
+import {useAuth} from "@/features/auth/hooks/use-auth";
+import {redirect} from "next/navigation";
+import {toast} from "sonner";
 
 const Page = () => {
+
+    const { isAuthenticated } = useAuth();
+
+    if( !isAuthenticated ){
+        toast.error("User not logged in");
+        redirect("/sign-in")
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center p-4">
             <div className="w-full max-w-6xl mx-auto">

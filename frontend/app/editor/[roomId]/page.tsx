@@ -24,6 +24,7 @@ import ProgramOutput from "@/features/editor/components/program-output";
 import ErrorOutput from "@/features/editor/components/error-output";
 import CompilationOutput from "@/features/editor/components/compilation-output";
 import GettingStarted from "@/features/editor/components/getting-started";
+import {useAuth} from "@/features/auth/hooks/use-auth";
 
 const EditorPage = () => {
     const params = useParams();
@@ -49,8 +50,9 @@ hello();`);
     const [stdin, setStdin] = useState('');
     const [languageId, setLanguageId] = useState(LANGUAGES.JAVASCRIPT);
 
-
     const { submitAndPoll, reset, result, executeCode, error, loading } = useCodeExecution();
+
+    const { isAuthenticated } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -168,6 +170,11 @@ hello();`);
             code: value,
         });
     };
+
+    if( !isAuthenticated ){
+        toast.error("User not looged in.");
+        redirect("/sign-in")
+    }
 
     if (!currUsername) {
         toast.error("Username is required");

@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 import { ACTION } from './utils/actions';
 import { initDB } from "./db";
@@ -22,6 +23,9 @@ initDB();
 
 
 app.use(express.json());
+app.use(cors({
+    origin: "http://localhost:3000",
+}));
 
 app.use("/api/auth", authRoute);
 app.use("/api/room", roomRoute);

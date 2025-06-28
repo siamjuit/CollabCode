@@ -9,7 +9,7 @@ declare global {
     }
 }
 
-export const validateToken = async (req: Request, res: Response, next: NextFunction) => {
+export const validateToken = (req: Request, res: Response, next: NextFunction) => {
     try {
         const authHeader = req.headers.authorization;
 
@@ -28,7 +28,7 @@ export const validateToken = async (req: Request, res: Response, next: NextFunct
             throw new Error("JWT_SECRET is not defined");
         }
 
-        const decoded = await jwt.verify(token, secret) as { userId: string };
+        const decoded = jwt.verify(token, secret) as { userId: string };
 
         req.userId = decoded.userId;
 
