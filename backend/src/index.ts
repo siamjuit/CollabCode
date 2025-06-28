@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 
 import { ACTION } from './utils/actions';
 import { initDB } from "./db";
+import authRoute from "./routes/auth.route";
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,11 @@ const io = new Server(server, {
 });
 const PORT = process.env.PORT || 8000;
 initDB();
+
+
+app.use(express.json());
+
+app.use("/api/auth", authRoute);
 
 const userSocketMap: Record<string, string> = {};
 

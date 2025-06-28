@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import {User} from "../models/user.model";
-import {createUserSchema} from "../utils/schema";
+import {createUserSchema, loginUserSchema} from "../utils/schema";
+import bcrypt from "bcryptjs";
+import {generateToken} from "../utils/utils";
 
 export const register = async ( req: Request, res: Response ) => {
     try{
@@ -37,10 +39,13 @@ export const register = async ( req: Request, res: Response ) => {
             password
         });
 
+        const token = generateToken(newUser._id.toString())
+
         res.status(201).json({
             success: true,
             message: "User created successfully",
-            data: newUser
+            data: newUser,
+            token
         });
 
     } catch (e) {
@@ -52,4 +57,60 @@ export const register = async ( req: Request, res: Response ) => {
     }
 }
 
-export const login = async ( req: Request, res: Response ) => {}
+export const login = async ( req: Request, res: Response ) => {
+    try{
+
+        const verify = loginUserSchema.safeParse(req.body);
+
+        if( !verify.success ) {
+            res.status(400).json({
+                success: false,
+                message: "All fields are required",
+                data: null
+            });
+            return;
+        }
+
+        const { email, password } = verify.data;
+
+        const user = await User.findOne({
+            email
+        });
+
+        if( !user ) {
+            res.status(400).json({
+                success: false,
+                message: "User not found",
+                data: null
+            });
+            return;
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+        if( !isPasswordCorrect ) {
+            res.status(400).json({
+                success: false,
+                message: "Incorrect password",
+                data: null
+            });
+            return;
+        }
+
+        const token  = generateToken(user._id.toString());
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully logged in",
+            data: user,
+            token
+        });
+
+    } catch (e) {
+        res.status(500).json({
+            success: false,
+            message: e,
+            data: null
+        });
+    }
+}
