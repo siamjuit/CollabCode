@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { ACTION } from './utils/actions';
 import { initDB } from "./db";
 import authRoute from "./routes/auth.route";
+import roomRoute from "./routes/room.route";
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,7 @@ initDB();
 app.use(express.json());
 
 app.use("/api/auth", authRoute);
+app.use("/api/room", roomRoute);
 
 const userSocketMap: Record<string, string> = {};
 
