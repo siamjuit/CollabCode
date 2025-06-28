@@ -49,14 +49,14 @@ const languages = [
 
 const formSchema = z.object({
     name: z.string().min(1, 'Room name is required').max(50, 'Room name must be less than 50 characters'),
-    description: z.string().max(200, 'Description must be less than 200 characters').optional(),
+    description: z.string().max(200, 'Description must be less than 200 characters'),
     language: z.string().min(1, 'Please select a programming language'),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 interface CreateRoomFormProps {
-    onCreateRoom: (roomData: FormData) => void;
+    onCreateRoom: (roomData: FormData) => Promise<void>;
 }
 
 const  CreateRoomForm = ({ onCreateRoom }: CreateRoomFormProps) => {
@@ -77,8 +77,7 @@ const  CreateRoomForm = ({ onCreateRoom }: CreateRoomFormProps) => {
     const onSubmit = async (data: FormData) => {
         setIsSubmitting(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-            onCreateRoom(data);
+            await onCreateRoom(data);
             form.reset();
             setOpen(false);
         } catch (error) {
