@@ -18,7 +18,7 @@ const roomSchema = new mongoose.Schema({
         type: String,
     },
     language: {
-        type: String,
+        type: Number,
         required: true,
     },
     members: [{

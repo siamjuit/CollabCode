@@ -4,23 +4,26 @@ import {Calendar, Code, MoreVertical, Trash2, Users} from "lucide-react";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";
-import {Room} from "@/app/(dashboard)/home/page";
-import {formatDate, formatTime} from "@/lib/utils";
+import {LANGUAGES} from "@/data";
+import {formatDate} from "@/lib/utils";
 
 interface Props{
-    room :Room,
-    onClick: (room :Room) => void
+    room :any,
+    onClick: (room :any) => void
 }
 
 const languageColors: Record<string, string> = {
-    JavaScript: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
-    TypeScript: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-    Python: 'bg-green-500/20 text-green-300 border-green-500/30',
-    Java: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+    'Bosque': 'bg-lime-500/20 text-lime-300 border-lime-500/30',
+    'C3': 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30',
+    'C': 'bg-sky-500/20 text-sky-300 border-sky-500/30',
     'C++': 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-    React: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-    'Node.js': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    'C# (Mono)': 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    'Java': 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+    'Nim': 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+    'Python 2.7': 'bg-green-600/20 text-green-300 border-green-600/30',
+    'Python 3.10': 'bg-green-400/20 text-green-200 border-green-400/30',
 };
+
 
 const RoomCard = ({
     room,
@@ -41,18 +44,14 @@ const RoomCard = ({
                         <div className="flex items-center space-x-4">
                             <Badge
                                 variant="outline"
-                                className={`${languageColors[room.language] || 'bg-gray-500/20 text-gray-300 border-gray-500/30'} text-sm`}
+                                className={`${languageColors[LANGUAGES[room.language]] || 'bg-gray-500/20 text-gray-300 border-gray-500/30'} text-sm`}
                             >
                                 <Code className="h-3 w-3 mr-1" />
-                                {room.language}
+                                {LANGUAGES[room.language] || 'N/A'}
                             </Badge>
                             <div className="flex items-center text-sm text-gray-400">
                                 <Calendar className="h-4 w-4 mr-2" />
-                                <span>{formatDate(room.createdAt)} at {formatTime(room.createdAt)}</span>
-                            </div>
-                            <div className="flex items-center text-sm text-gray-400">
-                                <Users className="h-4 w-4 mr-2" />
-                                <span>{room.participants} participants</span>
+                                <span>{formatDate(room.createdAt)}</span>
                             </div>
                         </div>
                     </div>

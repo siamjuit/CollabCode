@@ -18,12 +18,6 @@ const userSchema = new mongoose.Schema({
         required: true,
         min: 8
     },
-    rooms: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Room',
-        }
-    ]
 }, {
     timestamps: true
 });

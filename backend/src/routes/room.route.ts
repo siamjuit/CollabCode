@@ -7,7 +7,7 @@ const roomRouter = express.Router();
 roomRouter.post("/create-room", validateToken, createRoom);
 roomRouter.patch('/update-room/:roomId', validateToken, updateRoom);
 roomRouter.get('/:roomId', validateToken, getRoomById);
-roomRouter.get("/user-room", validateToken, getUserRooms);
+roomRouter.get("/user/rooms", validateToken, getUserRooms);
 roomRouter.delete("/:roomId", validateToken, deleteRoom);
 
 export default roomRouter;

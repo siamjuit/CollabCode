@@ -1,11 +1,24 @@
+"use client"
+
 import React from 'react';
 import {Home} from "lucide-react";
-import {JoinRoomForm} from "@/features/dashboard/components/join-room-form";
-import {CreateRoomForm} from "@/features/dashboard/components/create-room-form";
+import JoinRoomForm from "@/features/dashboard/components/join-room-form";
+import CreateRoomForm from "@/features/dashboard/components/create-room-form";
+import {useAuth} from "@/features/auth/hooks/use-auth";
+import {createRoom} from "@/features/dashboard/api";
+import {useRouter} from "next/navigation";
 
 const DashboardHeader = () => {
 
-    const handleCreateRoom = (roomData: { name: string; description?: string; language: string }) => {
+    const {token} = useAuth();
+    const router = useRouter();
+
+    const handleCreateRoom = async (roomData: { name: string; description: string; language: string }) => {
+        await createRoom(
+            roomData,
+            token!
+        )
+        window.location.reload();
     };
 
     const handleJoinRoom = (roomId: string) => {

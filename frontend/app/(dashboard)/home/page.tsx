@@ -1,71 +1,25 @@
 "use client";
 
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import Alert from "@/features/dashboard/components/alert";
 import RoomCard from "@/features/dashboard/components/room-card";
 import DashboardHeader from "@/features/dashboard/components/dashboard-header";
 import EmptyCard from "@/features/dashboard/components/empty-card";
-
-export interface Room {
-    id: string;
-    name: string;
-    language: string;
-    createdAt: Date;
-    participants: number;
-}
-
+import {getUserRooms} from "@/features/dashboard/api";
+import {useAuth} from "@/features/auth/hooks/use-auth";
+import {Loader} from "lucide-react";
 
 
 export default function MyRoomsPage() {
-    const [rooms, setRooms] = useState<Room[]>([
-        {
-            id: '1',
-            name: 'Frontend Masters Study Group',
-            language: 'JavaScript',
-            createdAt: new Date('2024-01-15T10:30:00'),
-            participants: 8,
-        },
-        {
-            id: '2',
-            name: 'React Advanced Patterns',
-            language: 'React',
-            createdAt: new Date('2024-01-14T15:45:00'),
-            participants: 12,
-        },
-        {
-            id: '3',
-            name: 'Algorithm Practice Session',
-            language: 'Python',
-            createdAt: new Date('2024-01-13T09:15:00'),
-            participants: 6,
-        },
-        {
-            id: '4',
-            name: 'TypeScript Deep Dive',
-            language: 'TypeScript',
-            createdAt: new Date('2024-01-12T14:20:00'),
-            participants: 10,
-        },
-        {
-            id: '5',
-            name: 'Backend Architecture Discussion',
-            language: 'Node.js',
-            createdAt: new Date('2024-01-11T16:00:00'),
-            participants: 7,
-        },
-        {
-            id: '6',
-            name: 'Competitive Programming Club',
-            language: 'C++',
-            createdAt: new Date('2024-01-10T11:30:00'),
-            participants: 15,
-        },
-    ]);
+    const [rooms, setRooms] = useState<any[]>([]);
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
+    const [roomToDelete, setRoomToDelete] = useState<any | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const handleDeleteRoom = (room: Room) => {
+    const {token} = useAuth();
+
+    const handleDeleteRoom = (room: any) => {
         setRoomToDelete(room);
         setDeleteDialogOpen(true);
     };
@@ -78,6 +32,26 @@ export default function MyRoomsPage() {
         setDeleteDialogOpen(false);
     };
 
+
+    useEffect(() => {
+
+        const fetchRooms = async () => {
+            const rooms = await getUserRooms(token!);
+            setRooms(rooms);
+            setLoading(false);
+        }
+
+        fetchRooms();
+
+    }, []);
+
+    if( loading ){
+        return (
+          <div className={"flex min-h-screen justify-center items-center text-white"} >
+              <Loader className={"animate-spin"} />
+          </div>
+        );
+    }
 
 
     return (
@@ -92,7 +66,7 @@ export default function MyRoomsPage() {
                 ) : (
                     <div className="space-y-4">
                         {rooms.map((room) => (
-                            <RoomCard key={room.id} room={room} onClick={handleDeleteRoom} />
+                            <RoomCard key={room._id} room={room} onClick={handleDeleteRoom} />
                         ))}
                     </div>
                 )}

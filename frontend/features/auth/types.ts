@@ -5,10 +5,8 @@ export interface User {
     username: string;
     email: string;
     password: string;
-    rooms: string[];
     createdAt: string;
     updatedAt: string;
-    __v: number;
 }
 
 export interface AuthResponse {

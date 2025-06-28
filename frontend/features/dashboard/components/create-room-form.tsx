@@ -29,24 +29,23 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Plus, Code, Sparkles, Users } from 'lucide-react';
 
 const languages = [
-    { value: 'javascript', label: 'JavaScript', color: 'from-yellow-500/20 to-yellow-400/20 text-yellow-300 border-yellow-500/40' },
-    { value: 'typescript', label: 'TypeScript', color: 'from-blue-500/20 to-blue-400/20 text-blue-300 border-blue-500/40' },
-    { value: 'python', label: 'Python', color: 'from-green-500/20 to-green-400/20 text-green-300 border-green-500/40' },
-    { value: 'java', label: 'Java', color: 'from-orange-500/20 to-orange-400/20 text-orange-300 border-orange-500/40' },
-    { value: 'cpp', label: 'C++', color: 'from-purple-500/20 to-purple-400/20 text-purple-300 border-purple-500/40' },
-    { value: 'react', label: 'React', color: 'from-cyan-500/20 to-cyan-400/20 text-cyan-300 border-cyan-500/40' },
-    { value: 'nodejs', label: 'Node.js', color: 'from-emerald-500/20 to-emerald-400/20 text-emerald-300 border-emerald-500/40' },
-    { value: 'go', label: 'Go', color: 'from-teal-500/20 to-teal-400/20 text-teal-300 border-teal-500/40' },
-    { value: 'rust', label: 'Rust', color: 'from-red-500/20 to-red-400/20 text-red-300 border-red-500/40' },
-    { value: 'php', label: 'PHP', color: 'from-indigo-500/20 to-indigo-400/20 text-indigo-300 border-indigo-500/40' },
+    { value: 11, label: 'Bosque', color: 'from-lime-500/20 to-lime-400/20 text-lime-300 border-lime-500/40' },
+    { value: 3, label: 'C3', color: 'from-zinc-500/20 to-zinc-400/20 text-zinc-300 border-zinc-500/40' },
+    { value: 1, label: 'C', color: 'from-sky-500/20 to-sky-400/20 text-sky-300 border-sky-500/40' },
+    { value: 2, label: 'C++', color: 'from-purple-500/20 to-purple-400/20 text-purple-300 border-purple-500/40' },
+    { value: 22, label: 'C# (Mono)', color: 'from-blue-500/20 to-blue-400/20 text-blue-300 border-blue-500/40' },
+    { value: 4, label: 'Java', color: 'from-orange-500/20 to-orange-400/20 text-orange-300 border-orange-500/40' },
+    { value: 9, label: 'Nim', color: 'from-yellow-500/20 to-yellow-400/20 text-yellow-300 border-yellow-500/40' },
+    { value: 26, label: 'Python 2.7', color: 'from-green-600/20 to-green-500/20 text-green-300 border-green-600/40' },
+    { value: 28, label: 'Python 3.10', color: 'from-green-400/20 to-green-300/20 text-green-200 border-green-400/40' },
 ];
+
 
 const formSchema = z.object({
     name: z.string().min(1, 'Room name is required').max(50, 'Room name must be less than 50 characters'),
@@ -60,7 +59,7 @@ interface CreateRoomFormProps {
     onCreateRoom: (roomData: FormData) => void;
 }
 
-export function CreateRoomForm({ onCreateRoom }: CreateRoomFormProps) {
+const  CreateRoomForm = ({ onCreateRoom }: CreateRoomFormProps) => {
     const [open, setOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -73,7 +72,7 @@ export function CreateRoomForm({ onCreateRoom }: CreateRoomFormProps) {
         },
     });
 
-    const selectedLanguage = languages.find(lang => lang.value === form.watch('language'));
+    const selectedLanguage = languages.find(lang => lang.value.toString() === form.watch('language'));
 
     const onSubmit = async (data: FormData) => {
         setIsSubmitting(true);
@@ -120,7 +119,6 @@ export function CreateRoomForm({ onCreateRoom }: CreateRoomFormProps) {
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        {/* Room Name Field */}
                         <FormField
                             control={form.control}
                             name="name"
@@ -145,7 +143,6 @@ export function CreateRoomForm({ onCreateRoom }: CreateRoomFormProps) {
                             )}
                         />
 
-                        {/* Language Selection */}
                         <FormField
                             control={form.control}
                             name="language"
@@ -172,18 +169,12 @@ export function CreateRoomForm({ onCreateRoom }: CreateRoomFormProps) {
                                             {languages.map((language) => (
                                                 <SelectItem
                                                     key={language.value}
-                                                    value={language.value}
-                                                    className="text-gray-200 hover:bg-gray-800/60 focus:bg-gray-800/60 cursor-pointer"
+                                                    value={language.value.toString()}
+                                                    className="text-gray-200 hover:bg-gray-800/60 h focus:bg-gray-800/60 cursor-pointer"
                                                 >
                                                     <div className="flex items-center space-x-3">
                                                         <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${language.color.split(' ')[0]} ${language.color.split(' ')[1]}`} />
                                                         <span>{language.label}</span>
-                                                        <Badge
-                                                            variant="outline"
-                                                            className={`ml-auto ${language.color} text-xs backdrop-blur-sm`}
-                                                        >
-                                                            {language.label}
-                                                        </Badge>
                                                     </div>
                                                 </SelectItem>
                                             ))}
@@ -197,7 +188,6 @@ export function CreateRoomForm({ onCreateRoom }: CreateRoomFormProps) {
                             )}
                         />
 
-                        {/* Description Field */}
                         <FormField
                             control={form.control}
                             name="description"
@@ -254,3 +244,5 @@ export function CreateRoomForm({ onCreateRoom }: CreateRoomFormProps) {
         </Dialog>
     );
 }
+
+export default CreateRoomForm;

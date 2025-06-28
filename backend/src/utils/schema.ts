@@ -26,7 +26,7 @@ export const createRoomSchema = z.object({
     description: z.string()
         .max(500, "Description must be less than 500 characters")
         .optional(),
-    language: z.string()
+    language: z.number()
         .min(1, "Language is required"),
 });
 

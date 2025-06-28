@@ -36,7 +36,7 @@ interface JoinRoomFormProps {
     onJoinRoom: (roomId: string) => void;
 }
 
-export function JoinRoomForm({ onJoinRoom }: JoinRoomFormProps) {
+const JoinRoomForm = ({ onJoinRoom }: JoinRoomFormProps) => {
     const [open, setOpen] = useState(false);
     const [isJoining, setIsJoining] = useState(false);
 
@@ -168,3 +168,5 @@ export function JoinRoomForm({ onJoinRoom }: JoinRoomFormProps) {
         </Dialog>
     );
 }
+
+export default JoinRoomForm;

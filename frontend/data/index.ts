@@ -1,15 +1,18 @@
 export const LANGUAGES = {
-    BASH: 46,
-    C: 50,
-    CPP: 54,
-    CSHARP: 51,
-    GO: 60,
-    JAVA: 62,
-    JAVASCRIPT: 27,
-    PYTHON: 71,
-    RUST: 73,
-    TYPESCRIPT: 74,
+    11: "Bosque",
+    3: "C3",
+    1: "C",
+    2: "C++",
+    22: "C# (Mono)",
+    4: "Java",
+    9: "Nim",
+    26: "Python 2.7",
+    28: "Python 3.10",
 } as const;
+
+export type LanguageKey = keyof typeof LANGUAGES;
+
+export const getLanguageId = (key: LanguageKey): number => LANGUAGES[key];
 
 export interface SubmissionRequest {
     source_code: string;
