@@ -4,7 +4,7 @@ const url = 'https://judge0-extra-ce.p.rapidapi.com';
 
 const getHeaders = (apiKey: string) => {
     return {
-        'x-rapidapi-key': '5c8951a3dcmsh9676f53289e824dp16c2aejsn59b69be37e53',
+        'x-rapidapi-key': apiKey,
         'x-rapidapi-host': 'judge0-extra-ce.p.rapidapi.com',
         'Content-Type': 'application/json'
     }
@@ -20,12 +20,12 @@ export const submitCode = async (submission: SubmissionRequest, config: Judge0Co
     });
 
     if (!response.ok) {
+        console.log(response);
         throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
 
-    console.log(data);
     return data;
 }
 
@@ -43,7 +43,6 @@ export const getSubmission = async (token: string, config: Judge0Config) => {
 
     const data = await response.json();
 
-    console.log(data);
     return data;
 }
 

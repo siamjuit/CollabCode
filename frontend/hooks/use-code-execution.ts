@@ -15,7 +15,7 @@ export const useCodeExecution = () => {
         try {
             const data = await executeCodeClient(submission);
             setResult(data);
-        } catch (err) {useCodeExecution
+        } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
