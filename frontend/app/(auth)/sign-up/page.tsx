@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import {Eye, EyeOff, Mail, Lock, User, Loader} from 'lucide-react';
 import {useAuth} from "@/features/auth/hooks/use-auth";
 import {toast} from "sonner";
 import {redirect} from "next/navigation";
@@ -167,17 +167,17 @@ const Page = () => {
                             </div>
                             <Button
                                 type="submit"
-                                className="w-full bg-white text-black hover:bg-gray-200 transition-all duration-200"
+                                className="flex w-full bg-white text-black hover:bg-gray-200 transition-all duration-200 justify-center items-center"
                                 disabled={loading}
                             >
-                                {loading ? 'Creating account...' : 'Create account'}
+                                {loading ? <Loader className={"animate-spin"} /> : 'Create account'}
                             </Button>
                         </form>
                     </CardContent>
                     <CardFooter className="flex justify-center">
                         <p className="text-sm text-gray-400">
                             Already have an account?{' '}
-                            <Link href="/auth/signin" className="text-white hover:underline font-medium">
+                            <Link href="/sign-in" className="text-white hover:underline font-medium">
                                 Sign in
                             </Link>
                         </p>

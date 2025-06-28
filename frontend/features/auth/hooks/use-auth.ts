@@ -1,3 +1,5 @@
+"use client"
+
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '@/store';
 import { logout, clearError } from '@/store/slices/auth-slice';

@@ -4,11 +4,14 @@ import React, {useState} from 'react';
 import {Code, Menu, X} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
+import {useAuth} from "@/features/auth/hooks/use-auth";
 
 const Header = () => {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const router = useRouter()
+    const router = useRouter();
+
+    const { isAuthenticated } = useAuth()
 
     return (
         <header className="border-b border-gray-800/50 backdrop-blur-sm sticky top-0 z-50">
@@ -28,21 +31,26 @@ const Header = () => {
                     </div>
                 </div>
 
-                <div className="hidden md:flex items-center space-x-4">
-                    <Button
-                        variant="ghost"
-                        className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
-                        onClick={() => router.push("/sign-in")}
-                    >
-                        Sign in
-                    </Button>
-                    <Button
-                        className="bg-gray-700 hover:bg-gray-600 text-white shadow-lg shadow-gray-700/25 cursor-pointer"
-                        onClick={() => router.push("/sign-up")}
-                    >
-                        Sign up
-                    </Button>
-                </div>
+                {
+                    !isAuthenticated && (
+                        <div className="hidden md:flex items-center space-x-4">
+                            <Button
+                                variant="ghost"
+                                className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
+                                onClick={() => router.push("/sign-in")}
+                            >
+                                Sign in
+                            </Button>
+                            <Button
+                                className="bg-gray-700 hover:bg-gray-600 text-white shadow-lg shadow-gray-700/25 cursor-pointer"
+                                onClick={() => router.push("/sign-up")}
+                            >
+                                Sign up
+                            </Button>
+                        </div>
+                    )
+                }
+
 
                 <Button
                     variant="ghost"

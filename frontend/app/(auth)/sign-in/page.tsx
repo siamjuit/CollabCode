@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import {Eye, EyeOff, Mail, Lock, Loader} from 'lucide-react';
 import {useAuth} from "@/features/auth/hooks/use-auth";
 import {redirect} from "next/navigation";
 
@@ -16,11 +15,11 @@ const Page = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const { login, loading, error, isAuthenticated } = useAuth();
+    const { login, loading, isAuthenticated } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const data = await login({
+        await login({
             email,
             password,
         });
@@ -41,11 +40,6 @@ const Page = () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <Separator className="w-full bg-gray-700" />
-                            </div>
-                        </div>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="email" className="text-gray-300">Email</Label>
@@ -92,10 +86,10 @@ const Page = () => {
                             </div>
                             <Button
                                 type="submit"
-                                className="w-full bg-white text-black hover:bg-gray-200 transition-all duration-200"
+                                className="flex w-full bg-white text-black hover:bg-gray-200 transition-all duration-200 justify-center items-center"
                                 disabled={loading}
                             >
-                                {loading ? 'Signing in...' : 'Sign in'}
+                                {loading ? <Loader className={"animate-spin"} /> : 'Sign in'}
                             </Button>
                         </form>
                     </CardContent>
