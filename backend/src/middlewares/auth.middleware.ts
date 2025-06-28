@@ -14,10 +14,11 @@ export const validateToken = async (req: Request, res: Response, next: NextFunct
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
+             res.status(401).json({
                 success: false,
                 message: "No token provided",
             });
+             return
         }
 
         const token = authHeader.split(" ")[1];
@@ -27,14 +28,14 @@ export const validateToken = async (req: Request, res: Response, next: NextFunct
             throw new Error("JWT_SECRET is not defined");
         }
 
-        const decoded = jwt.verify(token, secret) as { userId: string };
+        const decoded = await jwt.verify(token, secret) as { userId: string };
 
         req.userId = decoded.userId;
 
         next();
     } catch (err) {
         console.log(err);
-        return res.status(401).json({
+         res.status(401).json({
             success: false,
             message: "Invalid or expired token",
         });

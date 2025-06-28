@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const roomSchema = new mongoose.Schema({
+    admin: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
     name: {
         type: String,
         required: true,
@@ -16,10 +21,10 @@ const roomSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    members: {
+    members: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-    }
+    }]
 }, {
     timestamps: true
 });

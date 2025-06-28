@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
+    admin: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
     username: {
         type: String,
         required: true,
@@ -17,10 +22,12 @@ const userSchema = new mongoose.Schema({
         required: true,
         min: 8
     },
-    rooms: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Room',
-    }
+    rooms: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Room',
+        }
+    ]
 }, {
     timestamps: true
 });
