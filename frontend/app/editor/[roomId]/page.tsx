@@ -12,7 +12,6 @@ import { initSocket } from "@/config/socket";
 import { Socket } from "socket.io-client";
 import { ACTION } from "@/lib/utils";
 import { toast } from "sonner";
-import { User } from "@/lib/types";
 import {useCodeExecution} from "@/hooks/use-code-execution";
 import {LANGUAGES} from "@/data";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
@@ -25,33 +24,43 @@ import ErrorOutput from "@/features/editor/components/error-output";
 import CompilationOutput from "@/features/editor/components/compilation-output";
 import GettingStarted from "@/features/editor/components/getting-started";
 import {useAuth} from "@/features/auth/hooks/use-auth";
-import {getRoomById} from "@/features/dashboard/api";
-import {Room} from "@/features/dashboard/types";
+import {getRoomById, joinRoom} from "@/features/dashboard/api";
+import {Room, RoomUser} from "@/features/dashboard/types";
 import useSaveCode from "@/features/dashboard/hooks/use-save-code";
+import {User} from "@/lib/types";
 
 const EditorPage = () => {
+    // Config state variables
     const params = useParams();
     const roomId = params.roomId as string;
     const searchParams = useSearchParams();
     const router = useRouter();
-
     const currUsername = searchParams.get("username") || "Anonymous";
 
-    const [code, setCode] = useState('');
+    // Members related state variables
+    const [roomMembers, setRoomMembers] = useState<RoomUser[]>([]);
+    const [activeUsers, setActiveUsers] = useState<User[]>([]);
 
-    const [users, setUsers] = useState<User[]>([]);
+    // Sockets related state variables
     const socketRef = useRef<Socket | null>(null);
     const hasInitialized = useRef(false);
     const isRemoteUpdate = useRef(false);
+
+    // Code editor related state variables
+    const [code, setCode] = useState('');
     const [stdin, setStdin] = useState('');
     const [languageId, setLanguageId] = useState(28);
     const [room, setRoom] = useState<Room | null>(null);
     const [saving, setSaving] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
+    // Code execution related hook
     const { submitAndPoll, result, executeCode, error, loading } = useCodeExecution();
 
+    // User authentication related state variables
     const { isAuthenticated, token, user } = useAuth();
 
+    // Code saving related hook
     const { debouncedSave } = useSaveCode(roomId, token!);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -68,9 +77,7 @@ const EditorPage = () => {
             language_id: languageId,
             stdin,
         });
-
     };
-
 
     const handleLeaveRoom = () => {
         socketRef.current?.emit('leave');
@@ -89,69 +96,98 @@ const EditorPage = () => {
         hasInitialized.current = true;
 
         const getRoom = async () => {
-            const room: Room = await getRoomById(token!, roomId);
-            setLanguageId(room.language)
-            setRoom(room);
-            setCode(room.code)
-        }
-
-        const init = async () => {
-            const socket = await initSocket();
-            socketRef.current = socket;
-
-            const handleError = (e: Error) => {
-                console.error(e);
-                toast.error("Error joining room");
+            try {
+                setIsLoading(true);
+                const room: Room = await getRoomById(token!, roomId);
+                setLanguageId(room.language);
+                setRoom(room);
+                setCode(room.code || '');
+                setRoomMembers(Array.isArray(room.members) ? room.members : []);
+            } catch (error) {
+                console.error('Error fetching room:', error);
+                toast.error("Failed to load room");
                 router.push("/home");
-            };
-
-            socket.on("connect_error", handleError);
-            socket.on("connect_failed", handleError);
-
-            socket.emit(ACTION.JOIN, {
-                roomId,
-                username: currUsername,
-                userId: user!._id
-            });
-
-            socket.on(ACTION.JOINED, ({ clients, username }) => {
-                if (username !== currUsername) {
-                    toast.success(`${username} joined the room`);
-                }
-                setUsers(clients);
-                socket.emit(ACTION.REQUEST_SYNC, {
-                    roomId,
-                    socketId: socket.id,
-                });
-            });
-
-            socket.on(ACTION.DISCONNECTED, ({ socketId, username }) => {
-                toast.success(`${username} disconnected`);
-                setUsers((prevUsers) =>
-                    prevUsers.filter((u) => u.socketId !== socketId)
-                );
-            });
-
-            socket.on(ACTION.SYNC_CODE, ({ code: incomingCode }) => {
-                if (incomingCode !== null) {
-                    isRemoteUpdate.current = true;
-                    setCode(incomingCode);
-                }
-            });
-
-            socket.on(ACTION.CODE_CHANGE, ({ code: incomingCode }) => {
-                if (incomingCode !== null) {
-                    setSaving(true)
-                    isRemoteUpdate.current = true;
-                    setCode(incomingCode);
-                    debouncedSave(incomingCode);
-                    setSaving(false)
-                }
-            });
+            } finally {
+                setIsLoading(false);
+            }
         };
 
-        getRoom().then(() => {});
-        init().then(() => {});
+        const init = async () => {
+            try {
+                const socket = await initSocket();
+                socketRef.current = socket;
+
+                const handleError = (e: Error) => {
+                    console.error(e);
+                    toast.error("Error joining room");
+                    router.push("/home");
+                };
+
+                socket.on("connect_error", handleError);
+                socket.on("connect_failed", handleError);
+
+                socket.emit(ACTION.JOIN, {
+                    roomId,
+                    username: currUsername,
+                    userId: user!._id
+                });
+
+                socket.on(ACTION.JOINED, async ({ clients, username }) => {
+                    console.log('Joined room:', clients);
+                    if (username !== currUsername) {
+                        toast.success(`${username} joined the room`);
+                    }
+                    try {
+                        const room: Room = await joinRoom(roomId, user!._id, token!);
+                        setRoomMembers(Array.isArray(room.members) ? room.members : []);
+                        setActiveUsers(clients);
+                        socket.emit(ACTION.REQUEST_SYNC, {
+                            roomId,
+                            socketId: socket.id,
+                        });
+                    } catch (error) {
+                        console.error('Error joining room:', error);
+                        toast.error("Failed to join room");
+                    }
+                });
+
+                socket.on(ACTION.DISCONNECTED, ({ socketId, username }) => {
+                    toast.success(`${username} disconnected`);
+                    setActiveUsers((prevUsers) => {
+                        // Ensure prevUsers is an array before filtering
+                        const safeUsers = Array.isArray(prevUsers) ? prevUsers : [];
+                        return safeUsers.filter((u) => u.socketId !== socketId);
+                    });
+                });
+
+                socket.on(ACTION.SYNC_CODE, ({ code: incomingCode }) => {
+                    if (incomingCode !== null && incomingCode !== undefined) {
+                        isRemoteUpdate.current = true;
+                        setCode(incomingCode);
+                    }
+                });
+
+                socket.on(ACTION.CODE_CHANGE, ({ code: incomingCode }) => {
+                    if (incomingCode !== null && incomingCode !== undefined) {
+                        setSaving(true);
+                        isRemoteUpdate.current = true;
+                        setCode(incomingCode);
+                        debouncedSave(incomingCode);
+                        setSaving(false);
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing socket:', error);
+                toast.error("Failed to connect to room");
+                router.push("/home");
+            }
+        };
+
+        Promise.all([getRoom(), init()]).catch((error) => {
+            console.error('Initialization error:', error);
+            toast.error("Failed to initialize editor");
+            router.push("/home");
+        });
 
         return () => {
             const socket = socketRef.current;
@@ -168,7 +204,6 @@ const EditorPage = () => {
         };
     }, []);
 
-
     const handleCodeChange = (value: string) => {
         if (isRemoteUpdate.current) {
             isRemoteUpdate.current = false;
@@ -183,9 +218,9 @@ const EditorPage = () => {
         });
     };
 
-    if( !isAuthenticated || !user || !token ){
+    if (!isAuthenticated || !user || !token) {
         toast.error("User not logged in.");
-        redirect("/sign-in")
+        redirect("/sign-in");
     }
 
     if (!currUsername) {
@@ -193,12 +228,14 @@ const EditorPage = () => {
         redirect("/home");
     }
 
-    if( !room ){
+    if (isLoading || !room) {
         return (
-            <div className={"flex items-center justify-center"} >
-                <Loader className={"animate-spin"} />
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader className="animate-spin w-8 h-8 text-white" />
+                </div>
             </div>
-        )
+        );
     }
 
     return (
@@ -206,8 +243,9 @@ const EditorPage = () => {
             <SidebarProvider>
                 <div className="flex w-full">
                     <EditorSidebar
-                        room={room!}
-                        users={users}
+                        room={room}
+                        roomMembers={roomMembers}
+                        activeMembers={activeUsers}
                         onLeaveRoom={handleLeaveRoom}
                         onCopyRoomId={handleCopyRoomId}
                     />
@@ -241,21 +279,18 @@ const EditorPage = () => {
                                     <CardHeader className="pb-2">
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="text-white">Code Editor</CardTitle>
-                                            <div className={"flex justify-center items-center gap-2"} >
-                                                {
-                                                    saving && (
-                                                        <Badge
-                                                            variant={"secondary"}
-                                                            className={"bg-blue-600/20 text-blue-300"}
-                                                        >
-                                                            <Loader className="animate-spin" />
-                                                            Syncing code
-                                                        </Badge>
-                                                    )
-                                                }
-
+                                            <div className="flex justify-center items-center gap-2">
+                                                {saving && (
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className="bg-blue-600/20 text-blue-300"
+                                                    >
+                                                        <Loader className="animate-spin w-3 h-3 mr-1" />
+                                                        Syncing code
+                                                    </Badge>
+                                                )}
                                                 <Badge variant="secondary" className="bg-blue-600/20 text-blue-300">
-                                                    {LANGUAGES[languageId as keyof typeof LANGUAGES]  }
+                                                    {LANGUAGES[languageId as keyof typeof LANGUAGES] || 'Unknown'}
                                                 </Badge>
                                             </div>
                                         </div>

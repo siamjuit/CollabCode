@@ -23,8 +23,6 @@ const DashboardHeader = () => {
         console.log(roomId);
     };
 
-
-
     return (
         <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

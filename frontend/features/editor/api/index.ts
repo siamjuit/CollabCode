@@ -14,8 +14,9 @@ export const saveCodeToDatabase = async (roomId: string, code: string, token: st
         throw new Error('Failed to save code');
     }
 
-
     const {data} = await response.json();
+
+    console.log("updated room", data);
     console.log(data)
     return data
 };

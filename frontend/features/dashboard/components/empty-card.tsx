@@ -1,6 +1,5 @@
 import React from 'react';
-import {Home, Plus} from "lucide-react";
-import {Button} from "@/components/ui/button";
+import {Home} from "lucide-react";
 
 const EmptyCard = () => {
     return (
@@ -10,10 +9,6 @@ const EmptyCard = () => {
             </div>
             <h3 className="text-lg font-medium text-gray-300 mb-2">No rooms yet</h3>
             <p className="text-gray-500 mb-6">Create your first room to start collaborating</p>
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 cursor-pointer">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Your First Room
-            </Button>
         </div>
     );
 };

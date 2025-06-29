@@ -23,6 +23,7 @@ export const loginUser = createAsyncThunk<
             const data: AuthResponse = await response.json();
 
             if (!response.ok) {
+                toast.error("Login failed")
                 return rejectWithValue(data.message || 'Login failed');
             }
 
@@ -30,6 +31,7 @@ export const loginUser = createAsyncThunk<
 
             return data;
         } catch (error) {
+            toast.error("Login failed")
             return rejectWithValue(
                 error instanceof Error ? error.message : 'Network error occurred'
             );

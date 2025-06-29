@@ -109,8 +109,8 @@ export const getUserRooms = async (req: Request, res: Response) => {
                 { admin: req.userId },
                 { members: req.userId }
             ]
-        }).populate('admin', 'name email')
-            .populate('members', 'name email');
+        }).populate('admin', 'username email')
+            .populate('members', 'username email');
 
         res.status(200).json({
             success: true,

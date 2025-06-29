@@ -167,7 +167,7 @@ const Page = () => {
                             </div>
                             <Button
                                 type="submit"
-                                className="flex w-full bg-white text-black hover:bg-gray-200 transition-all duration-200 justify-center items-center"
+                                className="flex w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-200 justify-center items-center cursor-pointer"
                                 disabled={loading}
                             >
                                 {loading ? <Loader className={"animate-spin"} /> : 'Create account'}

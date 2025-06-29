@@ -86,7 +86,7 @@ const Page = () => {
                             </div>
                             <Button
                                 type="submit"
-                                className="flex w-full bg-white text-black hover:bg-gray-200 transition-all duration-200 justify-center items-center"
+                                className="flex w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-200 justify-center items-center cursor-pointer"
                                 disabled={loading}
                             >
                                 {loading ? <Loader className={"animate-spin"} /> : 'Sign in'}
@@ -96,7 +96,7 @@ const Page = () => {
                     <CardFooter className="flex justify-center">
                         <p className="text-sm text-gray-400">
                             Don&#39;t have an account?{' '}
-                            <Link href={"/sign-up"} className="text-white hover:underline font-medium">
+                            <Link href={"/sign-up"} className="text-white hover:underline font-medium cursor-pointer">
                                 Sign up
                             </Link>
                         </p>

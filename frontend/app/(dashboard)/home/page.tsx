@@ -9,6 +9,8 @@ import {getUserRooms} from "@/features/dashboard/api";
 import {useAuth} from "@/features/auth/hooks/use-auth";
 import {Loader} from "lucide-react";
 import {Room} from "@/features/dashboard/types";
+import {toast} from "sonner";
+import {redirect} from "next/navigation";
 
 
 const  Page = () => {
@@ -18,7 +20,7 @@ const  Page = () => {
     const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const {token} = useAuth();
+    const {token, isAuthenticated, user} = useAuth();
 
     const handleDeleteRoom = (room: Room) => {
         setRoomToDelete(room);
@@ -48,11 +50,18 @@ const  Page = () => {
 
     if( loading ){
         return (
-          <div className={"flex min-h-screen justify-center items-center text-white"} >
-              <Loader className={"animate-spin"} />
-          </div>
+            <div className={"flex min-h-screen justify-center items-center text-white"} >
+                <Loader className={"animate-spin"} />
+            </div>
         );
     }
+
+    if( !isAuthenticated || !user || !token){
+        toast.error("User not logged in");
+        redirect("/sign-in")
+    }
+
+
 
 
     return (

@@ -1,5 +1,4 @@
-// User interface for admin and members
-interface RoomUser {
+export interface RoomUser {
     _id: string;
     email: string;
 }
