@@ -44,8 +44,6 @@ const clearStorage = () => {
     }
 };
 
-
-
 const storedAuth = loadFromStorage();
 
 const initialState: AuthState = {

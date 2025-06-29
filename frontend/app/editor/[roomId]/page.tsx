@@ -52,7 +52,7 @@ const EditorPage = () => {
 
     const { isAuthenticated, token, user } = useAuth();
 
-    const { debouncedSave, forceSave } = useSaveCode(roomId, token!);
+    const { debouncedSave } = useSaveCode(roomId, token!);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -255,7 +255,7 @@ const EditorPage = () => {
                                                 }
 
                                                 <Badge variant="secondary" className="bg-blue-600/20 text-blue-300">
-                                                    {LANGUAGES[languageId]  }
+                                                    {LANGUAGES[languageId as keyof typeof LANGUAGES]  }
                                                 </Badge>
                                             </div>
                                         </div>

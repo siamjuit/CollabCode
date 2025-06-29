@@ -7,24 +7,20 @@ const decodeBase64 = (str: string | null): string | null => {
     try {
         return atob(str);
     } catch (e) {
-        console.warn('Failed to decode base64:', str);
-        return str; // Return original if decoding fails
+        console.log('Failed to decode base64:', e);
+        return str;
     }
 };
 
-// Process and decode Judge0 response
 const processExecutionResult = (result: any) => {
     return {
         ...result,
-        // Decode base64 encoded fields
         stdout: decodeBase64(result.stdout),
         stderr: decodeBase64(result.stderr),
         compile_output: decodeBase64(result.compile_output),
-        // Add convenience fields
-        success: result.status_id === 3, // Status ID 3 = Accepted
+        success: result.status_id === 3,
         hasOutput: !!result.stdout,
         hasError: !!result.stderr || result.exit_code !== 0,
-        // Keep original encoded values for reference if needed
         raw: {
             stdout: result.stdout,
             stderr: result.stderr,
@@ -53,7 +49,6 @@ export async function GET(
 
         const result = await getSubmission(token, config);
 
-        // Process and decode the result
         const processedResult = processExecutionResult(result);
 
         console.log("result: ", processedResult);

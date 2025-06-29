@@ -45,10 +45,10 @@ const RoomCard = ({
                         <div className="flex items-center space-x-4">
                             <Badge
                                 variant="outline"
-                                className={`${languageColors[LANGUAGES[room.language]] || 'bg-gray-500/20 text-gray-300 border-gray-500/30'} text-sm`}
+                                className={`${languageColors[LANGUAGES[room.language as keyof typeof LANGUAGES]] || 'bg-gray-500/20 text-gray-300 border-gray-500/30'} text-sm`}
                             >
                                 <Code className="h-3 w-3 mr-1" />
-                                {LANGUAGES[room.language] || 'N/A'}
+                                {LANGUAGES[room.language as keyof typeof LANGUAGES]}
                             </Badge>
                             <div className="flex items-center text-sm text-gray-400">
                                 <Calendar className="h-4 w-4 mr-2" />

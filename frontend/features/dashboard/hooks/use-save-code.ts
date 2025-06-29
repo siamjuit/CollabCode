@@ -5,10 +5,8 @@ import {saveCodeToDatabase} from "@/features/editor/api";
 const useSaveCode = (roomId: string, token: string, debounceDelay = 2000) => {
     const [isSaving, setIsSaving] = useState(false);
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
-    const saveTimeoutRef = useRef(null);
+    const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const lastSavedCodeRef = useRef('');
-
-
 
     const debouncedSave = useCallback((code: string) => {
         if (code === lastSavedCodeRef.current) {
@@ -55,7 +53,7 @@ const useSaveCode = (roomId: string, token: string, debounceDelay = 2000) => {
             console.error('Manual save failed:', error);
             setIsSaving(false);
             toast.error('Failed to save code');
-            throw error; // Re-throw for component to handle if needed
+            throw error;
         }
     }, [roomId, token]);
 

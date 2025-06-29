@@ -26,8 +26,3 @@ export const formatDate = (isoString: string) => {
 
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
-
-
-
-
-
