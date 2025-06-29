@@ -154,7 +154,6 @@ const EditorPage = () => {
                 socket.on(ACTION.DISCONNECTED, ({ socketId, username }) => {
                     toast.success(`${username} disconnected`);
                     setActiveUsers((prevUsers) => {
-                        // Ensure prevUsers is an array before filtering
                         const safeUsers = Array.isArray(prevUsers) ? prevUsers : [];
                         return safeUsers.filter((u) => u.socketId !== socketId);
                     });

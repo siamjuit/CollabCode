@@ -1,6 +1,7 @@
 export interface RoomUser {
     _id: string;
     email: string;
+    username: string;
 }
 
 export interface Room {

@@ -85,7 +85,7 @@ export const updateRoom = async (req: Request, res: Response) => {
 
         }
 
-        const updatedRoom = await Room.findById(roomId).populate("members", "name email");
+        const updatedRoom = await Room.findById(roomId).populate("members", "_id username email");
 
         res.status(200).json({
             success: true,

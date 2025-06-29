@@ -2,7 +2,7 @@
 
 import React from 'react';
 import {Badge} from "@/components/ui/badge";
-import {Calendar, Code, Copy, MoreVertical, Trash2} from "lucide-react";
+import {Calendar, Code, Copy, LogOut, MoreVertical, Trash2} from "lucide-react";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";
@@ -15,12 +15,14 @@ import {Room} from "@/features/dashboard/types";
 
 interface Props{
     room: Room,
-    onClick: (room: Room) => void
+    onDeleteRoom: (room: Room) => void,
+    onLeaveRoom: (room: Room) => void
 }
 
 const RoomCard = ({
     room,
-    onClick
+    onDeleteRoom,
+    onLeaveRoom
 }: Props) => {
 
     const router = useRouter();
@@ -86,12 +88,26 @@ const RoomCard = ({
                                 Copy Room Id
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => onClick(room)}
+                                onClick={() => onLeaveRoom(room)}
                                 className="text-red-400 hover:text-red-300 hover:bg-red-900/20 cursor-pointer"
                             >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete Room
+                                <LogOut className="h-4 w-4 mr-2" />
+                                Leave Room
                             </DropdownMenuItem>
+
+                            {/* Only room admins can delete a room */}
+                            {
+                                user!._id == room.admin._id && (
+                                    <DropdownMenuItem
+                                        onClick={() => onDeleteRoom(room)}
+                                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20 cursor-pointer"
+                                    >
+                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        Delete Room
+                                    </DropdownMenuItem>
+                                )
+                            }
+
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

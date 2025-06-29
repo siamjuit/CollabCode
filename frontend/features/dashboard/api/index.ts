@@ -117,3 +117,57 @@ export const joinRoom = async (roomId: string, userId: string, token: string) =>
         toast.error("Failed to join room.")
     }
 };
+
+export const leaveRoom = async (roomId: string, userId: string, token: string) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/update-room/${roomId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                members: {
+                    action: "remove",
+                    userIds: [userId]
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        toast.success("Successfully left room")
+        return data;
+    } catch (error) {
+        console.error('Error adding user to room:', error);
+        toast.error("Failed to leave room.")
+    }
+};
+
+export const deleteRoom = async (roomId: string, token: string) => {
+    try{
+
+        const response = await fetch(`${API_BASE_URL}/${roomId}`, {
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if( !response.ok ){
+            console.log(response);
+            toast.error("Error deleting room");
+            return;
+        }
+
+        toast.success("Room deleted successfully");
+
+    } catch (e) {
+        toast.error("Error deleting room");
+    }
+}

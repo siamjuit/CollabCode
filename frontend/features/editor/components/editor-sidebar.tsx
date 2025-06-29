@@ -110,13 +110,13 @@ const EditorSidebar = ({ room, roomMembers, activeMembers, onLeaveRoom, onCopyRo
                                             <div className="relative">
                                                 <Avatar className="h-8 w-8">
                                                     <AvatarFallback className={`text-white bg-blue-600 font-semibold text-lg uppercase rounded-md`}>
-                                                        {user.email?.[0] || '?'}
+                                                        {user.username?.[0] || '?'}
                                                     </AvatarFallback>
                                                 </Avatar>
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium text-gray-200 truncate">
-                                                    {user.email || 'Unknown User'}
+                                                    {user.username || 'Unknown User'}
                                                 </p>
                                             </div>
                                         </SidebarMenuButton>

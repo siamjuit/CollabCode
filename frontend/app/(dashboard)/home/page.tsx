@@ -5,7 +5,7 @@ import Alert from "@/features/dashboard/components/alert";
 import RoomCard from "@/features/dashboard/components/room-card";
 import DashboardHeader from "@/features/dashboard/components/dashboard-header";
 import EmptyCard from "@/features/dashboard/components/empty-card";
-import {getUserRooms} from "@/features/dashboard/api";
+import {deleteRoom, getUserRooms, leaveRoom} from "@/features/dashboard/api";
 import {useAuth} from "@/features/auth/hooks/use-auth";
 import {Loader} from "lucide-react";
 import {Room} from "@/features/dashboard/types";
@@ -17,7 +17,11 @@ const  Page = () => {
     const [rooms, setRooms] = useState<Room[]>([]);
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+
     const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
+    const [roomToLeave, setRoomToLeave] = useState<Room | null>(null);
+
     const [loading, setLoading] = useState(true);
 
     const {token, isAuthenticated, user} = useAuth();
@@ -27,12 +31,25 @@ const  Page = () => {
         setDeleteDialogOpen(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (roomToDelete) {
-            setRooms(rooms.filter(room => room._id !== roomToDelete._id));
-            setRoomToDelete(null);
+            await deleteRoom(roomToDelete._id, token!);
+            window.location.reload()
         }
         setDeleteDialogOpen(false);
+    };
+
+    const handleLeaveRoom = (room: Room) => {
+        setRoomToLeave(room);
+        setLeaveDialogOpen(true);
+    };
+
+    const confirmLeave = async () => {
+        if (roomToLeave) {
+            await leaveRoom(roomToLeave._id, user!._id, token!);
+            window.location.reload()
+        }
+        setLeaveDialogOpen(false);
     };
 
 
@@ -74,7 +91,7 @@ const  Page = () => {
                 ) : (
                     <div className="space-y-4">
                         {rooms.map((room) => (
-                            <RoomCard key={room._id} room={room} onClick={handleDeleteRoom} />
+                            <RoomCard key={room._id} room={room} onDeleteRoom={handleDeleteRoom} onLeaveRoom={handleLeaveRoom} />
                         ))}
                     </div>
                 )}
@@ -87,6 +104,15 @@ const  Page = () => {
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
                 onClick={confirmDelete}
+            />
+
+            <Alert
+                title={"Leave Room"}
+                description={`Are you sure you want to leave ${roomToDelete?.name}? This action cannot be undone
+                            and all room data will be permanently lost.`}
+                open={leaveDialogOpen}
+                onOpenChange={setLeaveDialogOpen}
+                onClick={confirmLeave}
             />
         </div>
     );

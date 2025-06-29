@@ -115,7 +115,7 @@ const JoinRoomForm = ({ onJoinRoom }: JoinRoomFormProps) => {
                                             placeholder="Enter room ID (e.g., ABC123)"
                                             {...field}
                                             className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-green-500/50 focus:ring-green-500/20 backdrop-blur-sm transition-all duration-200 h-12 font-mono text-lg tracking-wider"
-                                            onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                                            onChange={(e) => field.onChange(e.target.value)}
                                         />
                                     </FormControl>
                                     <FormDescription className="text-gray-500 text-sm">
@@ -154,7 +154,7 @@ const JoinRoomForm = ({ onJoinRoom }: JoinRoomFormProps) => {
                             <Button
                                 type="submit"
                                 disabled={isJoining}
-                                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-200 min-w-[120px]"
+                                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-white shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-200 min-w-[120px]"
                             >
                                 {isJoining ? (
                                     <div className="flex items-center space-x-2">
