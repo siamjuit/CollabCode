@@ -25,6 +25,9 @@ import ErrorOutput from "@/features/editor/components/error-output";
 import CompilationOutput from "@/features/editor/components/compilation-output";
 import GettingStarted from "@/features/editor/components/getting-started";
 import {useAuth} from "@/features/auth/hooks/use-auth";
+import {getRoomById} from "@/features/dashboard/api";
+import {Room} from "@/features/dashboard/types";
+import useSaveCode from "@/features/dashboard/hooks/use-save-code";
 
 const EditorPage = () => {
     const params = useParams();
@@ -34,25 +37,22 @@ const EditorPage = () => {
 
     const currUsername = searchParams.get("username") || "Anonymous";
 
-    const [code, setCode] = useState(`// Welcome to the collaborative code editor!
-
-function hello() {
-  console.log("Hello!");
-  console.log("You're now in room: ${roomId}");
-}
-
-hello();`);
+    const [code, setCode] = useState('');
 
     const [users, setUsers] = useState<User[]>([]);
     const socketRef = useRef<Socket | null>(null);
     const hasInitialized = useRef(false);
     const isRemoteUpdate = useRef(false);
     const [stdin, setStdin] = useState('');
-    const [languageId, setLanguageId] = useState(LANGUAGES.JAVASCRIPT);
+    const [languageId, setLanguageId] = useState(28);
+    const [room, setRoom] = useState<Room | null>(null);
+    const [saving, setSaving] = useState(false);
 
-    const { submitAndPoll, reset, result, executeCode, error, loading } = useCodeExecution();
+    const { submitAndPoll, result, executeCode, error, loading } = useCodeExecution();
 
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, token, user } = useAuth();
+
+    const { debouncedSave, forceSave } = useSaveCode(roomId, token!);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -88,6 +88,13 @@ hello();`);
         if (hasInitialized.current) return;
         hasInitialized.current = true;
 
+        const getRoom = async () => {
+            const room: Room = await getRoomById(token!, roomId);
+            setLanguageId(room.language)
+            setRoom(room);
+            setCode(room.code)
+        }
+
         const init = async () => {
             const socket = await initSocket();
             socketRef.current = socket;
@@ -104,6 +111,7 @@ hello();`);
             socket.emit(ACTION.JOIN, {
                 roomId,
                 username: currUsername,
+                userId: user!._id
             });
 
             socket.on(ACTION.JOINED, ({ clients, username }) => {
@@ -133,13 +141,17 @@ hello();`);
 
             socket.on(ACTION.CODE_CHANGE, ({ code: incomingCode }) => {
                 if (incomingCode !== null) {
+                    setSaving(true)
                     isRemoteUpdate.current = true;
                     setCode(incomingCode);
+                    debouncedSave(incomingCode);
+                    setSaving(false)
                 }
             });
         };
 
-        init();
+        getRoom().then(() => {});
+        init().then(() => {});
 
         return () => {
             const socket = socketRef.current;
@@ -171,8 +183,8 @@ hello();`);
         });
     };
 
-    if( !isAuthenticated ){
-        toast.error("User not looged in.");
+    if( !isAuthenticated || !user || !token ){
+        toast.error("User not logged in.");
         redirect("/sign-in")
     }
 
@@ -181,12 +193,20 @@ hello();`);
         redirect("/home");
     }
 
+    if( !room ){
+        return (
+            <div className={"flex items-center justify-center"} >
+                <Loader className={"animate-spin"} />
+            </div>
+        )
+    }
+
     return (
         <div>
             <SidebarProvider>
                 <div className="flex w-full">
                     <EditorSidebar
-                        roomId={roomId}
+                        room={room!}
                         users={users}
                         onLeaveRoom={handleLeaveRoom}
                         onCopyRoomId={handleCopyRoomId}
@@ -221,9 +241,23 @@ hello();`);
                                     <CardHeader className="pb-2">
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="text-white">Code Editor</CardTitle>
-                                            <Badge variant="secondary" className="bg-blue-600/20 text-blue-300">
-                                                Python
-                                            </Badge>
+                                            <div className={"flex justify-center items-center gap-2"} >
+                                                {
+                                                    saving && (
+                                                        <Badge
+                                                            variant={"secondary"}
+                                                            className={"bg-blue-600/20 text-blue-300"}
+                                                        >
+                                                            <Loader className="animate-spin" />
+                                                            Syncing code
+                                                        </Badge>
+                                                    )
+                                                }
+
+                                                <Badge variant="secondary" className="bg-blue-600/20 text-blue-300">
+                                                    {LANGUAGES[languageId]  }
+                                                </Badge>
+                                            </div>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="p-0">

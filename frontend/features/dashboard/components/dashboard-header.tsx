@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import {Home} from "lucide-react";
+import {Home, LogOut} from "lucide-react";
 import JoinRoomForm from "@/features/dashboard/components/join-room-form";
 import CreateRoomForm from "@/features/dashboard/components/create-room-form";
 import {useAuth} from "@/features/auth/hooks/use-auth";
@@ -9,7 +9,7 @@ import {createRoom} from "@/features/dashboard/api";
 
 const DashboardHeader = () => {
 
-    const {token} = useAuth();
+    const {token, logout} = useAuth();
 
     const handleCreateRoom = async (roomData: { name: string; description: string; language: string }) => {
         await createRoom(
@@ -23,6 +23,8 @@ const DashboardHeader = () => {
         console.log(roomId);
     };
 
+
+
     return (
         <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,6 +37,12 @@ const DashboardHeader = () => {
                     <div className="flex items-center space-x-3">
                         <JoinRoomForm onJoinRoom={handleJoinRoom} />
                         <CreateRoomForm onCreateRoom={handleCreateRoom} />
+                        <div
+                            className={"flex items-center justify-center space-x-2 cursor-pointer " + (token ? "" : "hidden")}
+                            onClick={logout}
+                        >
+                            <LogOut className={"h-6 w-6 text-white"}  />
+                        </div>
                     </div>
                 </div>
             </div>

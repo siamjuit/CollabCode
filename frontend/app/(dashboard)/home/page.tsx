@@ -8,25 +8,26 @@ import EmptyCard from "@/features/dashboard/components/empty-card";
 import {getUserRooms} from "@/features/dashboard/api";
 import {useAuth} from "@/features/auth/hooks/use-auth";
 import {Loader} from "lucide-react";
+import {Room} from "@/features/dashboard/types";
 
 
-export default function MyRoomsPage() {
-    const [rooms, setRooms] = useState<any[]>([]);
+const  Page = () => {
+    const [rooms, setRooms] = useState<Room[]>([]);
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [roomToDelete, setRoomToDelete] = useState<any | null>(null);
+    const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
     const [loading, setLoading] = useState(true);
 
     const {token} = useAuth();
 
-    const handleDeleteRoom = (room: any) => {
+    const handleDeleteRoom = (room: Room) => {
         setRoomToDelete(room);
         setDeleteDialogOpen(true);
     };
 
     const confirmDelete = () => {
         if (roomToDelete) {
-            setRooms(rooms.filter(room => room.id !== roomToDelete.id));
+            setRooms(rooms.filter(room => room._id !== roomToDelete._id));
             setRoomToDelete(null);
         }
         setDeleteDialogOpen(false);
@@ -56,10 +57,8 @@ export default function MyRoomsPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
-            {/* App Bar */}
             <DashboardHeader />
 
-            {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {rooms.length === 0 ? (
                     <EmptyCard />
@@ -83,3 +82,6 @@ export default function MyRoomsPage() {
         </div>
     );
 }
+
+
+export default Page;

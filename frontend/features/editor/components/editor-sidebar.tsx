@@ -16,15 +16,16 @@ import { Button } from '@/components/ui/button';
 import { Copy, LogOut } from 'lucide-react';
 import {toast} from "sonner";
 import {User} from "@/lib/types";
+import {Room} from "@/features/dashboard/types";
 
 interface EditorSidebarProps {
-    roomId: string;
+    room: Room;
     users: User[];
     onLeaveRoom: () => void;
     onCopyRoomId: () => void;
 }
 
-const EditorSidebar = ({ users, onLeaveRoom, onCopyRoomId }: EditorSidebarProps) => {
+const EditorSidebar = ({ room, users, onLeaveRoom, onCopyRoomId }: EditorSidebarProps) => {
 
     const handleCopyRoomId = async () => {
         try {
@@ -45,7 +46,7 @@ const EditorSidebar = ({ users, onLeaveRoom, onCopyRoomId }: EditorSidebarProps)
         <Sidebar className="bg-black/80 border-r border-gray-700/30 backdrop-blur-md mt-16 pb-16">
             <SidebarHeader className="border-b border-gray-700/30 p-4 bg-sidebar-accent-foreground">
                 <div className="space-y-2">
-                    <h2 className="text-lg font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent truncate">Collab Code</h2>
+                    <h2 className="text-lg font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent truncate">{room.name}</h2>
                 </div>
             </SidebarHeader>
 

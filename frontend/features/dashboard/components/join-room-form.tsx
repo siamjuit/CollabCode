@@ -25,6 +25,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Users, Hash, LogIn } from 'lucide-react';
+import {useRouter} from "next/navigation";
+import {useAuth} from "@/features/auth/hooks/use-auth";
 
 const formSchema = z.object({
     roomId: z.string().min(1, 'Room ID is required').min(6, 'Room ID must be at least 6 characters'),
@@ -46,12 +48,15 @@ const JoinRoomForm = ({ onJoinRoom }: JoinRoomFormProps) => {
             roomId: '',
         },
     });
+    const router = useRouter();
+
+    const { user } = useAuth();
+
 
     const onSubmit = async (data: FormData) => {
         setIsJoining(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-            onJoinRoom(data.roomId);
+            router.push(`/editor/${data.roomId}?username=${user!.username}`);
             form.reset();
             setOpen(false);
         } catch (error) {
@@ -61,6 +66,7 @@ const JoinRoomForm = ({ onJoinRoom }: JoinRoomFormProps) => {
         }
     };
 
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -68,6 +74,7 @@ const JoinRoomForm = ({ onJoinRoom }: JoinRoomFormProps) => {
                     variant="outline"
                     size="sm"
                     className="border-gray-700/50 bg-gray-800/30 text-gray-300 hover:bg-gray-700/40 hover:text-white hover:border-gray-600/50 transition-all duration-200 backdrop-blur-sm cursor-pointer"
+
                 >
                     <Users className="h-4 w-4 mr-2" />
                     Join Room

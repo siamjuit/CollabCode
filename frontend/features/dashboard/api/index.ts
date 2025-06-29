@@ -61,3 +61,59 @@ export const getUserRooms = async (token: string) => {
         return []
     }
 }
+
+export const getRoomById = async (token: string, roomId: string) => {
+    try{
+
+        const response = await fetch(`${API_BASE_URL}/${roomId}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if( !response.ok ){
+            console.log(response);
+            toast.error("Error fetching room");
+            return;
+        }
+
+        const {data} = await response.json();
+
+        return data;
+
+    } catch (e) {
+        toast.error("Error fetching room");
+    }
+}
+
+
+export const joinRoom = async (roomId: string, userId: string, token: string) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/update-room/${roomId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                members: {
+                    action: "add",
+                    userIds: [userId]
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('User added to room members:', data);
+        return data;
+    } catch (error) {
+        console.error('Error adding user to room:', error);
+        toast.error("Failed to join room.")
+    }
+};

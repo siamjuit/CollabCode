@@ -19,7 +19,7 @@ const io = new Server(server, {
     },
 });
 const PORT = process.env.PORT || 8000;
-initDB();
+initDB().then(() => console.log('DB connected'));
 
 
 app.use(express.json());
